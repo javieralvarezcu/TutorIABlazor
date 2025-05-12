@@ -1,0 +1,40 @@
+﻿@page "/"
+@page "/select-profile"
+@using Microsoft.AspNetCore.Components
+@using Tabler.Docs.Data.AuthService
+@using Tabler.Docs.Model.Auth
+@inject IAuthService _authService
+@using Tabler.Docs.Shared
+@layout MinimalLayout
+
+<div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="text-center w-75" style="max-width: 50rem;">
+        <h1 class="mb-4">¡Hola!</h1>
+        <h4 class="mb-4">¿Quién eres?</h4>
+
+        <div class="card shadow-sm">
+            @foreach (var item in profiles)
+            {
+                <div class="card-body border-bottom" style="cursor: pointer;" @onclick="@(() => OnProfileSelected(item.Id))">
+                    <h5 class="mb-0">@item.Name</h5>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    IEnumerable<User> profiles;
+
+    protected override void OnInitialized()
+    {
+        _localStorage.ClearAsync();
+        profiles = _authService.GetUsers();
+    }
+
+    void OnProfileSelected(int profileId)
+    {
+        _localStorage.SetItemAsync("profile", profileId);
+        _navigation.NavigateTo($"/dashboard");
+    }
+}
