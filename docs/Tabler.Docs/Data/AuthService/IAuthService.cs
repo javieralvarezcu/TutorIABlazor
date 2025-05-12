@@ -6,5 +6,6 @@ namespace Tabler.Docs.Data.AuthService
     public interface IAuthService
     {
         IEnumerable<User> GetUsers();
+        User GetUserById(int id);
     }
 }

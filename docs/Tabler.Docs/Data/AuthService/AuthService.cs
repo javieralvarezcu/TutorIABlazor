@@ -16,6 +16,11 @@ namespace Tabler.Docs.Data.AuthService
             _dbContext = dbContext;
         }
 
+        public User GetUserById(int id)
+        {
+            return _dbContext.Users.Where(x => x.Id == id).FirstOrDefault();
+        }
+
         public IEnumerable<User> GetUsers()
         {
             return _dbContext.Users.ToList();

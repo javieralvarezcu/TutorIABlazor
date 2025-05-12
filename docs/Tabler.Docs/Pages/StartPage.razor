@@ -1,8 +1,8 @@
 @page "/dashboard"
 @using Tabler.Docs.Shared
 
-<AuthorizeProfile/>
-<TutorIA.PageMainTitle>Dashboard</TutorIA.PageMainTitle> 
+<AuthorizeProfile />
+<TutorIA.PageMainTitle>¡Hola @(userData.Name)!</TutorIA.PageMainTitle>
 <PagePretitle>
     Blazor
     <Icon class="align-text-top" IconType="@TablerIcons.Heart" TextColor="TablerColor.Red" Size="12" Filled=true />
@@ -47,4 +47,19 @@
 
 </Row>
 
+@code {
+    private User userData = new();
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        var userId = await _localStorage.GetItemAsync<int?>("profile");
+
+        userData = _authService.GetUserById(userId.Value);
+
+        StateHasChanged();
+
+    }
+}
 
