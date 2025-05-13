@@ -8,6 +8,7 @@ using TutorIA.QuickTable.EntityFramework;
 using Tabler.Docs.Services;
 using Blazored.LocalStorage;
 using Tabler.Docs.Data.AuthService;
+using Tabler.Docs.Data.QuestionnaireService;
 
 
 namespace Tabler.Docs.Server
@@ -27,6 +28,7 @@ namespace Tabler.Docs.Server
         {
             services.AddScoped<IDataService, LocalDataService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IQuestionnaireService, QuestionnaireService>();
             services.AddDbContextFactory<ApplicationDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:ServernitaxxConnection"]));
             services.AddQuickTableEntityFrameworkAdapter();
             services.AddRazorPages();

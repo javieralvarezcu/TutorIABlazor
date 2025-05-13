@@ -49,6 +49,65 @@ namespace Tabler.Docs.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.AnswerOption", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsSelected")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("AnswerOptions");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.QuestionBase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(34)
+                        .HasColumnType("nvarchar(34)");
+
+                    b.Property<string>("Header")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SubHeader")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("QuestionBases");
+
+                    b.HasDiscriminator().HasValue("QuestionBase");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.MultipleChoiceQuestion", b =>
+                {
+                    b.HasBaseType("Tabler.Docs.Model.Questionnaire.QuestionBase");
+
+                    b.HasDiscriminator().HasValue("MultipleChoiceQuestion");
+                });
+
             modelBuilder.Entity("Tabler.Docs.Data.Country", b =>
                 {
                     b.OwnsOne("Medals", "Medals", b1 =>
@@ -74,6 +133,22 @@ namespace Tabler.Docs.Migrations
                         });
 
                     b.Navigation("Medals");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.AnswerOption", b =>
+                {
+                    b.HasOne("Tabler.Docs.Model.Questionnaire.MultipleChoiceQuestion", "Question")
+                        .WithMany("Options")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.MultipleChoiceQuestion", b =>
+                {
+                    b.Navigation("Options");
                 });
 #pragma warning restore 612, 618
         }

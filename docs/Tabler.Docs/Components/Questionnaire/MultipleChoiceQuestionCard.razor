@@ -1,0 +1,26 @@
+﻿@using Tabler.Docs.Model
+@using Microsoft.AspNetCore.Components
+@using Tabler.Docs.Model.Questionnaire
+
+<Card Size="CardSize.Default" class="text-start">
+    <CardBody>
+        <CardTitle>
+            <h3>@Question.Header</h3>
+        </CardTitle>
+
+        @if (!string.IsNullOrWhiteSpace(Question.SubHeader))
+        {
+            <h5>@Question.SubHeader</h5>
+        }
+
+        @foreach (var option in Question.Options)
+        {
+            <Checkbox Label="@option.Text" @bind-Value="option.IsSelected" />
+        }
+    </CardBody>
+</Card>
+
+@code {
+    [Parameter]
+    public MultipleChoiceQuestion Question { get; set; } = new();
+}

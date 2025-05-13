@@ -1,0 +1,52 @@
+﻿@page "/questionnaire"
+@using Tabler.Docs.Components.Questionnaire
+@using Tabler.Docs.Data.QuestionnaireService
+@using Tabler.Docs.Model.Questionnaire
+@layout MinimalLayout
+@inject IQuestionnaireService _questionnaireService
+
+<div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="w-75" style="max-width: 50rem;">
+        <h1 class="text-center mb-4">QuestionnaireName</h1>
+
+        @foreach (var q in questions)
+        {
+            @switch (q)
+            {
+                case MultipleChoiceQuestion mcq:
+                    <MultipleChoiceQuestionCard Question="@mcq" />
+                    break;
+
+                // Aquí puedes agregar otros tipos en el futuro:
+                // case TextQuestion tq:
+                //     <TextQuestionCard Question="@tq" />
+                //     break;
+
+                default:
+                    <p>No se puede renderizar esta pregunta (tipo no soportado).</p>
+                    break;
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private List<QuestionBase>? questions = new();
+
+    private MultipleChoiceQuestion sampleQuestion = new()
+        {
+            Header = "Which tools do you use?",
+            SubHeader = "Select all that apply:",
+            Options = new List<AnswerOption>
+        {
+            new() { Text = "ChatGPT" },
+            new() { Text = "Copilot" },
+            new() { Text = "Notion AI" }
+        }
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        questions = await _questionnaireService.GetQuestionByIdsAsync(new int[] { 1 });
+    }
+}

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tabler.Docs.Data;
@@ -13,7 +14,14 @@ public static class SeedData
         var fac = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
         using var db = fac.CreateDbContext();
 #if DEBUG
-        db.Database.Migrate();
+        try
+        {
+            db.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
 #endif
         if (db.Database.EnsureCreated())
         {
