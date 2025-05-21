@@ -2,7 +2,7 @@
 @using Tabler.Docs.Shared
 
 <AuthorizeProfile />
-<TutorIA.PageMainTitle>¡Hola @(userData.Name)!</TutorIA.PageMainTitle>
+<TutorIA.PageMainTitle>¡Hola @(userData?.Name)!</TutorIA.PageMainTitle>
 <PagePretitle>
     Blazor
     <Icon class="align-text-top" IconType="@TablerIcons.Heart" TextColor="TablerColor.Red" Size="12" Filled=true />
@@ -53,10 +53,9 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        var userId = await _localStorage.GetItemAsync<int?>("profile") ?? 0;
 
-        var userId = await _localStorage.GetItemAsync<int?>("profile");
-
-        userData = _authService.GetUserById(userId.Value);
+        userData = _authService.GetUserById(userId);
 
         StateHasChanged();
 
