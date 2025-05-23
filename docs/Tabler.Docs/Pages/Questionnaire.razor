@@ -33,20 +33,8 @@
 @code {
     private List<QuestionBase>? questions = new();
 
-    private MultipleChoiceQuestion sampleQuestion = new()
-        {
-            Header = "Which tools do you use?",
-            SubHeader = "Select all that apply:",
-            Options = new List<AnswerOption>
-        {
-            new() { Text = "ChatGPT" },
-            new() { Text = "Copilot" },
-            new() { Text = "Notion AI" }
-        }
-        };
-
     protected override async Task OnInitializedAsync()
     {
-        questions = await _questionnaireService.GetQuestionByIdsAsync(new int[] { 1 });
+        questions = await _questionnaireService.GetQuestionByIdsAsync(new int[] { 2, 3, 4 });
     }
 }

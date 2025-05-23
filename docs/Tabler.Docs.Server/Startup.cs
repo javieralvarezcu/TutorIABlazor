@@ -9,6 +9,7 @@ using Tabler.Docs.Services;
 using Blazored.LocalStorage;
 using Tabler.Docs.Data.AuthService;
 using Tabler.Docs.Data.QuestionnaireService;
+using System;
 
 
 namespace Tabler.Docs.Server
@@ -34,6 +35,12 @@ namespace Tabler.Docs.Server
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddBlazoredLocalStorage();
+
+            services.AddHttpClient("InternalApiClient", client =>
+            {
+                client.BaseAddress = new Uri(Configuration["ApiUris:Local"]); // ajusta según tu caso
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
 
             services.AddScoped<ICodeSnippetService, LocalSnippetService>();
             services.AddDocs();

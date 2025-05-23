@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tabler.Docs.Model.Evaluation;
 using Tabler.Docs.Model.Questionnaire;
 
 namespace Tabler.Docs.Data.QuestionnaireService
@@ -14,5 +15,6 @@ namespace Tabler.Docs.Data.QuestionnaireService
         Task AddQuestionAsync(QuestionBase question);
         Task UpdateQuestionAsync(QuestionBase question);
         Task DeleteQuestionAsync(int id);
+        Task<StartRealTimeEvaluationResponse> StartRealTimeEvaluation(int userId, string[] skillNames);
     }
 }

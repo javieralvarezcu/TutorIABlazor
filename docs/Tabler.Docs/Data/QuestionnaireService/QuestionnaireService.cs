@@ -3,8 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Tabler.Docs.Model.Evaluation;
 using Tabler.Docs.Model.Questionnaire;
 
 namespace Tabler.Docs.Data.QuestionnaireService
@@ -12,9 +15,11 @@ namespace Tabler.Docs.Data.QuestionnaireService
     public class QuestionnaireService : IQuestionnaireService
     {
         private readonly ApplicationDbContext _dbContext;
-        public QuestionnaireService(ApplicationDbContext dbContext)
+        private readonly HttpClient _http;
+        public QuestionnaireService(ApplicationDbContext dbContext, IHttpClientFactory httpClientFactory)
         {
             _dbContext = dbContext;
+            _http = httpClientFactory.CreateClient("InternalApiClient");
         }
         public Task AddQuestionAsync(QuestionBase question)
         {
@@ -59,6 +64,32 @@ namespace Tabler.Docs.Data.QuestionnaireService
         public Task UpdateQuestionAsync(QuestionBase question)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<StartRealTimeEvaluationResponse> StartRealTimeEvaluation(int userId, string[] skillNames)
+        {
+            var payload = new
+            {
+                user_id = userId.ToString(),
+                skill_names = skillNames
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(payload),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _http.PostAsync("/evaluation/start_real_time_evaluation", content);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<StartRealTimeEvaluationResponse>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return result!;
         }
     }
 }
