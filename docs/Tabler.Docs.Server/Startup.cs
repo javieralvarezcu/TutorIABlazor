@@ -38,9 +38,15 @@ namespace Tabler.Docs.Server
             services.AddServerSideBlazor();
             services.AddBlazoredLocalStorage();
 
-            services.AddHttpClient("InternalApiClient", client =>
+            services.AddHttpClient("StudentEvalApiClient", client =>
             {
-                client.BaseAddress = new Uri(Configuration["ApiUris:Local"]); // ajusta según tu caso
+                client.BaseAddress = new Uri(Configuration["ApiUris:StudentEvalLocal"]); // ajusta según tu caso
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+
+            services.AddHttpClient("ContentGeneratorApiClient", client =>
+            {
+                client.BaseAddress = new Uri(Configuration["ApiUris:ContentGeneratorLocal"]); // ajusta según tu caso
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
 

@@ -14,5 +14,6 @@ namespace Tabler.Docs.Model.Questionnaire
 
         public int QuestionId { get; set; }
         public UniqueChoiceQuestion Question { get; set; } = default!;
+        public bool IsCorrect { get; set; }
     }
 }

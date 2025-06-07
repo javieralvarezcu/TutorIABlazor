@@ -163,6 +163,9 @@ namespace Tabler.Docs.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsSelected")
                         .HasColumnType("bit");
 

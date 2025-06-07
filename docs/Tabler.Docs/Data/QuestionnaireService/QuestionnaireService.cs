@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Tabler.Docs.Model.Evaluation;
 using Tabler.Docs.Model.Questionnaire;
@@ -15,20 +16,59 @@ namespace Tabler.Docs.Data.QuestionnaireService
     public class QuestionnaireService : IQuestionnaireService
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly HttpClient _http;
+        private readonly HttpClient _contentGeneratorHttpClient;
+        private readonly HttpClient _studentEvalHttpClient;
         public QuestionnaireService(ApplicationDbContext dbContext, IHttpClientFactory httpClientFactory)
         {
             _dbContext = dbContext;
-            _http = httpClientFactory.CreateClient("InternalApiClient");
-        }
-        public Task AddQuestionAsync(QuestionBase question)
-        {
-            throw new NotImplementedException();
+            _contentGeneratorHttpClient = httpClientFactory.CreateClient("ContentGeneratorApiClient");
+            _studentEvalHttpClient = httpClientFactory.CreateClient("StudentEvalApiClient");
         }
 
-        public Task DeleteQuestionAsync(int id)
+        public async Task<List<QuestionBase>> RequestQuestionsToAi(string topic, string difficulty, int numQuestions)
         {
-            throw new NotImplementedException();
+            var payload = new
+            {
+                topic,
+                difficulty,
+                num_questions = numQuestions
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(payload),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _contentGeneratorHttpClient.PostAsync("/api/v1/quiz/generate", content);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var rawQuestions = JsonSerializer.Deserialize<List<Class1>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (rawQuestions == null)
+                return new();
+
+            var result = rawQuestions.Select(q => new UniqueChoiceQuestion
+            {
+                Header = q.question,
+                SubHeader = q.description,
+                Options = new List<AnswerOption>
+        {
+            new() { Text = q.optionA, IsCorrect = q.correct_answer.Equals("A", StringComparison.OrdinalIgnoreCase) },
+            new() { Text = q.optionB, IsCorrect = q.correct_answer.Equals("B", StringComparison.OrdinalIgnoreCase) },
+            new() { Text = q.optionC, IsCorrect = q.correct_answer.Equals("C", StringComparison.OrdinalIgnoreCase) },
+            new() { Text = q.optionD, IsCorrect = q.correct_answer.Equals("D", StringComparison.OrdinalIgnoreCase) }
+        }
+            }).Cast<QuestionBase>().ToList();
+
+            _dbContext.QuestionBases.AddRange(result);
+            _dbContext.SaveChanges();
+
+            return result;
         }
 
         public async Task<List<QuestionBase>> GetQuestionByIdsAsync(int[] ids)
@@ -56,16 +96,6 @@ namespace Tabler.Docs.Data.QuestionnaireService
             return questions;
         }
 
-        public Task<List<QuestionBase>> GetQuestionsAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateQuestionAsync(QuestionBase question)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<StartRealTimeEvaluationResponse> StartRealTimeEvaluation(int userId, string[] skillNames)
         {
             var payload = new
@@ -80,7 +110,7 @@ namespace Tabler.Docs.Data.QuestionnaireService
                 "application/json"
             );
 
-            var response = await _http.PostAsync("/evaluation/start_real_time_evaluation", content);
+            var response = await _studentEvalHttpClient.PostAsync("/evaluation/start_real_time_evaluation", content);
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();

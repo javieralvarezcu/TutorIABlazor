@@ -23,7 +23,7 @@ namespace Tabler.Docs.Data.DatasetService
         public DatasetService(ApplicationDbContext dbContext, IHttpClientFactory httpClientFactory)
         {
             _dbContext = dbContext;
-            _http = httpClientFactory.CreateClient("InternalApiClient");
+            _http = httpClientFactory.CreateClient("StudentEvalApiClient");
         }
 
         public async Task<ParsedUpdateDatasetResponse> CheckDataset()

@@ -50,13 +50,13 @@
         {
             statusInfo = "Cargando preguntas...";
             StateHasChanged();
-            questions = await _questionnaireService.GetQuestionByIdsAsync(new int[] { 2, 3, 4 });
+            questions = await _questionnaireService.RequestQuestionsToAi("math", "easy", 2);
             statusInfo = "Obteniendo Id del usuario...";
             StateHasChanged();
             var userId = await _localStorage.GetItemAsync<int?>("profile") ?? 0;
             statusInfo = "Iniciando evaluación en tiempo real...";
             StateHasChanged();
-            startRealTimeEvaluationResponse = await _questionnaireService.StartRealTimeEvaluation(userId, new string[] { "algebra", "lens" });
+            startRealTimeEvaluationResponse = await _questionnaireService.StartRealTimeEvaluation(userId, new string[] { "parametros_cinematicos" });
             statusInfo = $"Evaluación iniciada.\n{startRealTimeEvaluationResponse.ToString()}";
             StateHasChanged();
         }
