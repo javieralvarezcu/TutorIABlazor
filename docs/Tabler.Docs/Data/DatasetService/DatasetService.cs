@@ -26,13 +26,43 @@ namespace Tabler.Docs.Data.DatasetService
             _http = httpClientFactory.CreateClient("InternalApiClient");
         }
 
-        public async Task<CheckDatasetResponseBody> CheckDataset()
+        public async Task<ParsedUpdateDatasetResponse> CheckDataset()
+        {
+            var response = await _http.PostAsync("/evaluation/get_model_status", null);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var items = JsonSerializer.Deserialize<List<Class1>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (items == null)
+            {
+                throw new Exception("Failed to deserialize response from UpdateDataset");
+            }
+
+            var wrapped = new UpdateDatasetResponseBody { Items = items };
+            var parsed = ParseUpdateDatasetResponseToEntities(wrapped);
+
+            _dbContext.StudentSubjects.RemoveRange(_dbContext.StudentSubjects);
+            _dbContext.SubjectSkills.RemoveRange(_dbContext.SubjectSkills);
+            _dbContext.SaveChanges();
+
+            _dbContext.StudentSubjects.AddRange(parsed.StudentSubjects);
+            _dbContext.SubjectSkills.AddRange(parsed.SubjectSkills);
+            _dbContext.SaveChanges();
+
+            return parsed!;
+        }
+
+        public async Task<CheckStudentDatasetResponseBody> CheckStudentDataset()
         {
             var response = await _http.PostAsync("/evaluation/check_students_dataset", null);
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<CheckDatasetResponseBody>(json, new JsonSerializerOptions
+            var result = JsonSerializer.Deserialize<CheckStudentDatasetResponseBody>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
@@ -63,7 +93,7 @@ namespace Tabler.Docs.Data.DatasetService
         public async Task<ParsedUpdateDatasetResponse> UpdateDataset(UpdateDatasetRequestBody updateDatasetRequestBody)
         {
             var content = new StringContent(
-            JsonSerializer.Serialize(updateDatasetRequestBody),
+                JsonSerializer.Serialize(updateDatasetRequestBody),
                 Encoding.UTF8,
                 "application/json"
             );
@@ -72,56 +102,74 @@ namespace Tabler.Docs.Data.DatasetService
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<UpdateDatasetResponseBody>(json, new JsonSerializerOptions
+            var items = JsonSerializer.Deserialize<List<Class1>>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
 
-            if (result == null)
+            if (items == null)
             {
                 throw new Exception("Failed to deserialize response from UpdateDataset");
             }
 
-            var parsed = ParseUpdateDatasetResponse(result);
+            var wrapped = new UpdateDatasetResponseBody { Items = items };
+            var parsed = ParseUpdateDatasetResponseToEntities(wrapped);
 
             return parsed!;
         }
 
-        internal ParsedUpdateDatasetResponse ParseUpdateDatasetResponse(UpdateDatasetResponseBody response)
+
+        private static ParsedUpdateDatasetResponse ParseUpdateDatasetResponseToEntities(UpdateDatasetResponseBody response)
         {
-            var parsed = new ParsedUpdateDatasetResponse
+            var studentSubjects = new List<StudentSubject>();
+            var subjectSkills = new List<SubjectSkill>();
+
+            foreach (var item in response.Items)
             {
-                StudentSubject = new StudentSubject
+                // Parse students_states
+                foreach (var studentState in item.students_states)
                 {
-                    Name = response.Property1.First().students_states.First().id,
-                    Skills = response.Property1.First().students_states
-                        .SelectMany(s => s.student_subject_list)
-                        .SelectMany(sub => sub.student_skill_list.Select(skill => new StudentSkill
+
+                    foreach (var subject in studentState.student_subject_list)
+                    {
+                        var studentSubject = new StudentSubject
                         {
-                            Name = skill.name,
-                            Learn = skill.learn
-                        }))
-                        .ToList()
-                },
-                SubjectSkills = response.Property1.First().skills_states
-                    .Select(skillState => new SubjectSkill
+                            Name = subject.subject_name,
+                            UserId = int.Parse(studentState.id),
+                            Skills = subject.student_skill_list.Select(skill => new StudentSkill
+                            {
+                                Name = skill.name,
+                                Learn = skill.learn
+                            }).ToList()
+                        };
+
+                        studentSubjects.Add(studentSubject);
+                    }
+                }
+
+                // Parse skills_states
+                foreach (var skillState in item.skills_states)
+                {
+                    var subjectSkill = new SubjectSkill
                     {
                         Name = skillState.skill_name,
-                        Subjects = skillState.subject_skill_list.Select(subject => new Subject
+                        SubjectDetails = skillState.subject_skill_list.Select(detail => new SubjectSkillDetail
                         {
-                            Name = subject.subject_skill_name
+                            Name = detail.subject_skill_name,
+                            States = detail.states.Select(s => new SkillState
+                            {
+                                Name = s.name,
+                                Value = s.value
+                            }).ToList()
                         }).ToList()
-                    })
-                    .ToList()
-            };
+                    };
 
-            // Relacionar StudentSkill con su StudentSubject
-            foreach (var skill in parsed.StudentSubject.Skills)
-            {
-                skill.StudentSubject = parsed.StudentSubject;
+                    subjectSkills.Add(subjectSkill);
+                }
             }
 
-            return parsed;
+            return new() { StudentSubjects = studentSubjects, SubjectSkills = subjectSkills };
         }
+
     }
 }

@@ -8,6 +8,7 @@ namespace Tabler.Docs.Data.DatasetService
     public interface IDatasetService
     {
         Task<ParsedUpdateDatasetResponse> UpdateDataset(UpdateDatasetRequestBody updateDatasetRequestBody);
-        Task<CheckDatasetResponseBody> CheckDataset();
+        Task<ParsedUpdateDatasetResponse> CheckDataset();
+        Task<CheckStudentDatasetResponseBody> CheckStudentDataset();
     }
 }

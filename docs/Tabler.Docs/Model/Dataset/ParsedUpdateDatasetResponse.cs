@@ -8,7 +8,7 @@ namespace Tabler.Docs.Model.Dataset
 {
     public class ParsedUpdateDatasetResponse
     {
-        public StudentSubject StudentSubject { get; set; }
+        public List<StudentSubject> StudentSubjects { get; set; }
         public List<SubjectSkill> SubjectSkills { get; set; }
     }
 }

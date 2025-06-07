@@ -49,6 +49,30 @@ namespace Tabler.Docs.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.SkillState", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SubjectSkillDetailId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Value")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubjectSkillDetailId");
+
+                    b.ToTable("SubjectStates");
+                });
+
             modelBuilder.Entity("Tabler.Docs.Model.Dataset.StudentSkill", b =>
                 {
                     b.Property<int>("Id")
@@ -63,7 +87,7 @@ namespace Tabler.Docs.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("StudentSubjectId")
+                    b.Property<int>("StudentSubjectId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -84,7 +108,7 @@ namespace Tabler.Docs.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -92,27 +116,6 @@ namespace Tabler.Docs.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("StudentSubjects");
-                });
-
-            modelBuilder.Entity("Tabler.Docs.Model.Dataset.Subject", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("SkillId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SkillId");
-
-                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("Tabler.Docs.Model.Dataset.SubjectSkill", b =>
@@ -131,7 +134,7 @@ namespace Tabler.Docs.Migrations
                     b.ToTable("SubjectSkills");
                 });
 
-            modelBuilder.Entity("Tabler.Docs.Model.Dataset.SubjectState", b =>
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.SubjectSkillDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -142,12 +145,14 @@ namespace Tabler.Docs.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float>("Value")
-                        .HasColumnType("real");
+                    b.Property<int>("SubjectSkillId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("SubjectStates");
+                    b.HasIndex("SubjectSkillId");
+
+                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.AnswerOption", b =>
@@ -184,8 +189,8 @@ namespace Tabler.Docs.Migrations
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasMaxLength(34)
-                        .HasColumnType("nvarchar(34)");
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
 
                     b.Property<string>("Header")
                         .HasColumnType("nvarchar(max)");
@@ -236,11 +241,24 @@ namespace Tabler.Docs.Migrations
                     b.Navigation("Medals");
                 });
 
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.SkillState", b =>
+                {
+                    b.HasOne("Tabler.Docs.Model.Dataset.SubjectSkillDetail", "SubjectSkillDetail")
+                        .WithMany("States")
+                        .HasForeignKey("SubjectSkillDetailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SubjectSkillDetail");
+                });
+
             modelBuilder.Entity("Tabler.Docs.Model.Dataset.StudentSkill", b =>
                 {
                     b.HasOne("Tabler.Docs.Model.Dataset.StudentSubject", "StudentSubject")
                         .WithMany("Skills")
-                        .HasForeignKey("StudentSubjectId");
+                        .HasForeignKey("StudentSubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("StudentSubject");
                 });
@@ -249,18 +267,22 @@ namespace Tabler.Docs.Migrations
                 {
                     b.HasOne("Tabler.Docs.Model.Auth.User", "User")
                         .WithMany("Subjects")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Tabler.Docs.Model.Dataset.Subject", b =>
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.SubjectSkillDetail", b =>
                 {
-                    b.HasOne("Tabler.Docs.Model.Dataset.SubjectSkill", "Skill")
-                        .WithMany("Subjects")
-                        .HasForeignKey("SkillId");
+                    b.HasOne("Tabler.Docs.Model.Dataset.SubjectSkill", "SubjectSkill")
+                        .WithMany("SubjectDetails")
+                        .HasForeignKey("SubjectSkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Skill");
+                    b.Navigation("SubjectSkill");
                 });
 
             modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.AnswerOption", b =>
@@ -286,7 +308,12 @@ namespace Tabler.Docs.Migrations
 
             modelBuilder.Entity("Tabler.Docs.Model.Dataset.SubjectSkill", b =>
                 {
-                    b.Navigation("Subjects");
+                    b.Navigation("SubjectDetails");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.SubjectSkillDetail", b =>
+                {
+                    b.Navigation("States");
                 });
 
             modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.UniqueChoiceQuestion", b =>

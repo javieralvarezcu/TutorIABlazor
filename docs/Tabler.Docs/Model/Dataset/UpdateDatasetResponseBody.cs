@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Tabler.Docs.Model.Dataset
 {
     public class UpdateDatasetResponseBody
     {
-        public Class1[] Property1 { get; set; }
+        [JsonExtensionData]
+        public List<Class1> Items { get; set; } = new();
     }
 
     public class Class1
