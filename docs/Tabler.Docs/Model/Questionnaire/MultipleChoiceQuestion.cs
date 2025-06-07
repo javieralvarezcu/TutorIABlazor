@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Tabler.Docs.Model.Questionnaire
 {
-    public class MultipleChoiceQuestion : QuestionBase
+    public class UniqueChoiceQuestion : QuestionBase
     {
         public List<AnswerOption> Options { get; set; } = new();
     }

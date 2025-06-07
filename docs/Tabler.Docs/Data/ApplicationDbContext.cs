@@ -28,9 +28,9 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Country>().OwnsOne(x => x.Medals);
         modelBuilder.Entity<QuestionBase>()
     .HasDiscriminator<string>("Discriminator")
-    .HasValue<MultipleChoiceQuestion>("MultipleChoiceQuestion");
+    .HasValue<UniqueChoiceQuestion>("UniqueChoiceQuestion");
 
-        modelBuilder.Entity<MultipleChoiceQuestion>()
+        modelBuilder.Entity<UniqueChoiceQuestion>()
             .HasMany(q => q.Options)
             .WithOne(o => o.Question)
             .HasForeignKey(o => o.QuestionId)

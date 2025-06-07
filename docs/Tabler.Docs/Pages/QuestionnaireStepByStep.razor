@@ -22,8 +22,8 @@
             <div>
                 @switch (questions[currentIndex])
                 {
-                    case MultipleChoiceQuestion mcq:
-                        <MultipleChoiceQuestionCard Question="@mcq" />
+                    case UniqueChoiceQuestion mcq:
+                        <UniqueChoiceQuestionCard Question="@mcq" />
                         break;
 
                     default:

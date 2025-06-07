@@ -37,16 +37,16 @@ namespace Tabler.Docs.Data.QuestionnaireService
         .Where(q => ids.Contains(q.Id))
         .ToListAsync();
 
-            // Cargar manualmente las opciones solo para las preguntas MultipleChoice
-            var multipleChoiceQuestions = questions
-                .OfType<MultipleChoiceQuestion>()
+            // Cargar manualmente las opciones solo para las preguntas UniqueChoice
+            var UniqueChoiceQuestions = questions
+                .OfType<UniqueChoiceQuestion>()
                 .ToList();
 
-            await _dbContext.Entry(multipleChoiceQuestions[0])
+            await _dbContext.Entry(UniqueChoiceQuestions[0])
                 .Collection(q => q.Options)
                 .LoadAsync();
 
-            foreach (var mcq in multipleChoiceQuestions)
+            foreach (var mcq in UniqueChoiceQuestions)
             {
                 await _dbContext.Entry(mcq)
                     .Collection(q => q.Options)

@@ -202,11 +202,11 @@ namespace Tabler.Docs.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.MultipleChoiceQuestion", b =>
+            modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.UniqueChoiceQuestion", b =>
                 {
                     b.HasBaseType("Tabler.Docs.Model.Questionnaire.QuestionBase");
 
-                    b.HasDiscriminator().HasValue("MultipleChoiceQuestion");
+                    b.HasDiscriminator().HasValue("UniqueChoiceQuestion");
                 });
 
             modelBuilder.Entity("Tabler.Docs.Data.Country", b =>
@@ -265,7 +265,7 @@ namespace Tabler.Docs.Migrations
 
             modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.AnswerOption", b =>
                 {
-                    b.HasOne("Tabler.Docs.Model.Questionnaire.MultipleChoiceQuestion", "Question")
+                    b.HasOne("Tabler.Docs.Model.Questionnaire.UniqueChoiceQuestion", "Question")
                         .WithMany("Options")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -289,7 +289,7 @@ namespace Tabler.Docs.Migrations
                     b.Navigation("Subjects");
                 });
 
-            modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.MultipleChoiceQuestion", b =>
+            modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.UniqueChoiceQuestion", b =>
                 {
                     b.Navigation("Options");
                 });

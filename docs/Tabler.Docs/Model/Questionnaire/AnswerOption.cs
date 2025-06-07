@@ -13,6 +13,6 @@ namespace Tabler.Docs.Model.Questionnaire
         public bool IsSelected { get; set; }
 
         public int QuestionId { get; set; }
-        public MultipleChoiceQuestion Question { get; set; } = default!;
+        public UniqueChoiceQuestion Question { get; set; } = default!;
     }
 }
