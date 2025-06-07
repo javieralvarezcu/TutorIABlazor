@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Tabler.Docs.Data;
 using Tabler.Docs.Model.Auth;
+using Tabler.Docs.Model.Dataset;
 using Tabler.Docs.Model.Questionnaire;
 
 public class ApplicationDbContext : DbContext
@@ -9,6 +10,11 @@ public class ApplicationDbContext : DbContext
     public DbSet<User> Users { get; set; } = default!;
     public DbSet<QuestionBase> QuestionBases { get; set; } = default!;
     public DbSet<AnswerOption> AnswerOptions { get; set; } = default!;
+    public DbSet<StudentSubject> StudentSubjects { get; set; } = default!;
+    public DbSet<StudentSkill> StudentSkills { get; set; } = default!;
+    public DbSet<SubjectSkill> SubjectSkills { get; set; } = default!;
+    public DbSet<Subject> Subjects { get; set; } = default!;
+    public DbSet<SubjectState> SubjectStates { get; set; } = default!;
 
     public ApplicationDbContext(DbContextOptions options) : base(options)
     {

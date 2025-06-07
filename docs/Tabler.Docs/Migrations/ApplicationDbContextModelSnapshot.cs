@@ -49,6 +49,107 @@ namespace Tabler.Docs.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.StudentSkill", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<float>("Learn")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("StudentSubjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentSubjectId");
+
+                    b.ToTable("StudentSkills");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.StudentSubject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("StudentSubjects");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.Subject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SkillId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SkillId");
+
+                    b.ToTable("Subjects");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.SubjectSkill", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubjectSkills");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.SubjectState", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Value")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubjectStates");
+                });
+
             modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.AnswerOption", b =>
                 {
                     b.Property<int>("Id")
@@ -135,6 +236,33 @@ namespace Tabler.Docs.Migrations
                     b.Navigation("Medals");
                 });
 
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.StudentSkill", b =>
+                {
+                    b.HasOne("Tabler.Docs.Model.Dataset.StudentSubject", "StudentSubject")
+                        .WithMany("Skills")
+                        .HasForeignKey("StudentSubjectId");
+
+                    b.Navigation("StudentSubject");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.StudentSubject", b =>
+                {
+                    b.HasOne("Tabler.Docs.Model.Auth.User", "User")
+                        .WithMany("Subjects")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.Subject", b =>
+                {
+                    b.HasOne("Tabler.Docs.Model.Dataset.SubjectSkill", "Skill")
+                        .WithMany("Subjects")
+                        .HasForeignKey("SkillId");
+
+                    b.Navigation("Skill");
+                });
+
             modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.AnswerOption", b =>
                 {
                     b.HasOne("Tabler.Docs.Model.Questionnaire.MultipleChoiceQuestion", "Question")
@@ -144,6 +272,21 @@ namespace Tabler.Docs.Migrations
                         .IsRequired();
 
                     b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Auth.User", b =>
+                {
+                    b.Navigation("Subjects");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.StudentSubject", b =>
+                {
+                    b.Navigation("Skills");
+                });
+
+            modelBuilder.Entity("Tabler.Docs.Model.Dataset.SubjectSkill", b =>
+                {
+                    b.Navigation("Subjects");
                 });
 
             modelBuilder.Entity("Tabler.Docs.Model.Questionnaire.MultipleChoiceQuestion", b =>

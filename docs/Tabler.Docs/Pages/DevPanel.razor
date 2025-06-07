@@ -1,0 +1,42 @@
+﻿@page "/devpanel"
+@using System.IO
+@using Tabler.Docs.Data.DatasetService
+@using System.Text.Json
+@using Tabler.Docs.Model.Dataset
+@inject IDatasetService _datasetService
+
+<h3>DevPanel</h3>
+
+<div class="mb-3">
+    <button class="btn btn-secondary" @onclick="CallCheckDataset">Check Dataset</button>
+</div>
+
+@if (response is not null)
+{
+    <h5>Response:</h5>
+    <pre>@JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true })</pre>
+}
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@code {
+    private string jsonInput = string.Empty;
+    private object? response;
+    private string? errorMessage;
+
+    private async Task CallCheckDataset()
+    {
+        errorMessage = null;
+        try
+        {
+            response = await _datasetService.CheckDataset();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error al llamar a CheckDataset: {ex.Message}";
+        }
+    }
+}
