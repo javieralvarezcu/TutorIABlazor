@@ -10,5 +10,6 @@ namespace Tabler.Docs.Data.DatasetService
         Task<ParsedUpdateDatasetResponse> UpdateDataset(UpdateDatasetRequestBody updateDatasetRequestBody);
         Task<ParsedUpdateDatasetResponse> CheckDataset();
         Task<CheckStudentDatasetResponseBody> CheckStudentDataset();
+        Task<List<StudentSkill>> GetStudentSkillByUserIdAsync(int userId);
     }
 }

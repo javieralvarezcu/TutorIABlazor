@@ -15,7 +15,7 @@
 
         @if (questions is null || currentIndex >= questions.Count)
         {
-            <p class="text-center">¡Cuestionario completado!</p>
+            <p class="text-center">No hay preguntas disponibles.</p>
         }
         else
         {
@@ -48,15 +48,17 @@
     {
         if (firstRender)
         {
-            statusInfo = "Cargando preguntas...";
-            StateHasChanged();
-            questions = await _questionnaireService.RequestQuestionsToAi("math", "easy", 2);
             statusInfo = "Obteniendo Id del usuario...";
             StateHasChanged();
             var userId = await _localStorage.GetItemAsync<int?>("profile") ?? 0;
+            statusInfo = "Cargando preguntas...";
+            StateHasChanged();
+            string[] skills = (await _datasetService.GetStudentSkillByUserIdAsync(userId)).Select(ss => ss.Name).ToArray();
+            var cachedQuestions = await _questionnaireService.RequestQuestionsToAi(string.Join(',', skills), "easy", 2);
             statusInfo = "Iniciando evaluación en tiempo real...";
             StateHasChanged();
-            startRealTimeEvaluationResponse = await _questionnaireService.StartRealTimeEvaluation(userId, new string[] { "parametros_cinematicos" });
+            startRealTimeEvaluationResponse = await _questionnaireService.StartRealTimeEvaluation(userId, skills );
+            questions = cachedQuestions;
             statusInfo = $"Evaluación iniciada.\n{startRealTimeEvaluationResponse.ToString()}";
             StateHasChanged();
         }

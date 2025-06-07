@@ -171,5 +171,11 @@ namespace Tabler.Docs.Data.DatasetService
             return new() { StudentSubjects = studentSubjects, SubjectSkills = subjectSkills };
         }
 
+        public Task<List<StudentSkill>> GetStudentSkillByUserIdAsync(int userId)
+        {
+            return _dbContext.StudentSkills
+                .Where(ss => ss.StudentSubject.UserId == userId)
+                .ToListAsync();
+        }
     }
 }
