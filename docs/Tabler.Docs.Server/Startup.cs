@@ -10,6 +10,7 @@ using Blazored.LocalStorage;
 using Tabler.Docs.Data.AuthService;
 using Tabler.Docs.Data.QuestionnaireService;
 using System;
+using Tabler.Docs.Data.DatasetService;
 
 
 namespace Tabler.Docs.Server
@@ -30,6 +31,7 @@ namespace Tabler.Docs.Server
             services.AddScoped<IDataService, LocalDataService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IQuestionnaireService, QuestionnaireService>();
+            services.AddScoped<IDatasetService, DatasetService>();
             services.AddDbContextFactory<ApplicationDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:ServernitaxxConnection"]));
             services.AddQuickTableEntityFrameworkAdapter();
             services.AddRazorPages();
