@@ -1,0 +1,50 @@
+﻿@page "/select-skills"
+@using System.Globalization
+@inject IDatasetService _datasetService
+@inject NavigationManager _navigation
+
+@layout MinimalLayout
+
+<div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="text-center w-75" style="max-width: 50rem;">
+        <h1 class="mb-4">¿Qué habilidades tienes?</h1>
+        <h4 class="mb-4">Selecciona una para continuar</h4>
+
+        @if (skills is null)
+        {
+            <div class="text-muted">Cargando habilidades...</div>
+        }
+        else
+        {
+            <div class="card shadow-sm">
+                @foreach (var skill in skills)
+                {
+                    <div class="card-body border-bottom" style="cursor: pointer;" @onclick="() => OnSkillSelected(skill)">
+                        <h5 class="mb-0">@CultureInfo.CurrentCulture.TextInfo.ToTitleCase(skill.Replace("_", " "))</h5>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<string>? skills;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var userId = await _localStorage.GetItemAsync<int?>("profile") ?? 0;
+            var result = await _datasetService.GetStudentSkillByUserIdAsync(userId);
+            skills = result.Select(s => s.Name).Distinct().ToList();
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnSkillSelected(string skill)
+    {
+        await _localStorage.SetItemAsync("selectedSkill", skill);
+        _navigation.NavigateTo("/questionnaire/step");
+    }
+}

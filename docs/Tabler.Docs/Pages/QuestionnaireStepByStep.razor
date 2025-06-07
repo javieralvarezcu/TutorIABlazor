@@ -51,13 +51,13 @@
             statusInfo = "Obteniendo Id del usuario...";
             StateHasChanged();
             var userId = await _localStorage.GetItemAsync<int?>("profile") ?? 0;
+            string skill = await _localStorage.GetItemAsync<string>("selectedSkill");
             statusInfo = "Cargando preguntas...";
             StateHasChanged();
-            string[] skills = (await _datasetService.GetStudentSkillByUserIdAsync(userId)).Select(ss => ss.Name).ToArray();
-            var cachedQuestions = await _questionnaireService.RequestQuestionsToAi(string.Join(',', skills), "easy", 2);
+            var cachedQuestions = await _questionnaireService.RequestQuestionsToAi(skill, "easy", 2);
             statusInfo = "Iniciando evaluación en tiempo real...";
             StateHasChanged();
-            startRealTimeEvaluationResponse = await _questionnaireService.StartRealTimeEvaluation(userId, skills );
+            startRealTimeEvaluationResponse = await _questionnaireService.StartRealTimeEvaluation(userId, new string[] { skill });
             questions = cachedQuestions;
             statusInfo = $"Evaluación iniciada.\n{startRealTimeEvaluationResponse.ToString()}";
             StateHasChanged();
