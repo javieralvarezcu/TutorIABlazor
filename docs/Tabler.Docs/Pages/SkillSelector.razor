@@ -36,9 +36,6 @@
     {
         if (firstRender)
         {
-            var userId = await _localStorage.GetItemAsync<int?>("profile") ?? 0;
-            var result = await _datasetService.GetStudentSkillByUserIdAsync(userId);
-
             skills = (await _localStorage.GetItemAsync<List<StudentSkill>>("skills")).Select(s => s.Name).Distinct().ToList();
             StateHasChanged();
         }
