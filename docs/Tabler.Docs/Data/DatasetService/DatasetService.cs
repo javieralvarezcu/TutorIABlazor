@@ -13,6 +13,7 @@ using Tabler.Docs.Model.Dataset;
 using static System.Net.WebRequestMethods;
 using Tabler.Docs.Model.Evaluation;
 using Tabler.Docs.Migrations;
+using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Tabler.Docs.Data.DatasetService
 {
@@ -176,6 +177,37 @@ namespace Tabler.Docs.Data.DatasetService
             return _dbContext.StudentSkills
                 .Where(ss => ss.StudentSubject.UserId == userId)
                 .ToListAsync();
+        }
+
+        public async Task<StudentStateRoasterResponseBody> GetStudentStateRoasterById(int userId)
+        {
+            var payload = new
+            {
+                user_id = userId.ToString()
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(payload),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _http.PostAsync("/evaluation/get_student_state_roaster", content);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<List<StudentStateRoasterResponseBody>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (result == null)
+            {
+                throw new Exception("Failed to deserialize response from StudentStateRoaster");
+            }
+
+
+            return result.FirstOrDefault()!;
         }
     }
 }
