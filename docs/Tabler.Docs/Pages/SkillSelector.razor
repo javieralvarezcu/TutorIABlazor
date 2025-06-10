@@ -1,5 +1,6 @@
 ﻿@page "/select-skills"
 @using System.Globalization
+@using Tabler.Docs.Model.Dataset
 @inject IDatasetService _datasetService
 @inject NavigationManager _navigation
 
@@ -29,7 +30,7 @@
 </div>
 
 @code {
-    private List<string>? skills;
+    private List<string> skills = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -37,7 +38,8 @@
         {
             var userId = await _localStorage.GetItemAsync<int?>("profile") ?? 0;
             var result = await _datasetService.GetStudentSkillByUserIdAsync(userId);
-            skills = result.Select(s => s.Name).Distinct().ToList();
+
+            skills = (await _localStorage.GetItemAsync<List<StudentSkill>>("skills")).Select(s => s.Name).Distinct().ToList();
             StateHasChanged();
         }
     }

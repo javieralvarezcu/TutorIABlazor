@@ -31,6 +31,6 @@
     void OnProfileSelected(int profileId)
     {
         _localStorage.SetItemAsync("profile", profileId);
-        _navigation.NavigateTo($"/select-skills");
+        _navigation.NavigateTo($"/dashboard");
     }
 }

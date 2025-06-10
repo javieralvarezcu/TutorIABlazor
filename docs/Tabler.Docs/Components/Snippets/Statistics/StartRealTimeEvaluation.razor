@@ -1,0 +1,23 @@
+@using Tabler.Docs.Model.Dataset
+<Card Size="CardSize.Small">
+    <CardBody class="d-flex align-items-center" @onclick="() => CardOnClick()">
+        <span class="bg-blue text-white avatar me-3">
+        <Icon IconType="@TablerIcons.Abacus" />
+        </span>
+        <div class="me-3 lh-sm">
+            <div class="strong">
+                Empezar evaluación en tiempo real
+            </div>
+            <div class="text-secondary">@(Skills.Count()) habilidades a entrenar</div>
+        </div>
+    </CardBody>
+</Card>
+@code
+{
+    [Parameter] public List<StudentSkill> Skills { get; set; }
+
+    private async Task CardOnClick()
+    {
+        _navigation.NavigateTo("/select-skills");
+    }
+}
