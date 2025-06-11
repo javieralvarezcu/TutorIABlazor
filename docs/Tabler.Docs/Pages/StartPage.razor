@@ -1,4 +1,6 @@
 @page "/dashboard"
+@using System.Text.Json
+@using System.Text.Json.Serialization
 @using Tabler.Docs.Model.Dataset
 @using Tabler.Docs.Shared
 
@@ -14,38 +16,38 @@
     <RowCol Sm="12" Md="6" Lg="3">
         <Tabler.Docs.Components.Snippets.Statistics.StartRealTimeEvaluation Skills=@(skills) />
     </RowCol>
-@*     <RowCol Sm="12" Md="6" Lg="3">
-        <Tabler.Docs.Components.Snippets.Statistics.SmallOrders />
+    @*     <RowCol Sm="12" Md="6" Lg="3">
+    <Tabler.Docs.Components.Snippets.Statistics.SmallOrders />
     </RowCol>
     <RowCol Sm="12" Md="6" Lg="3">
-        <Tabler.Docs.Components.Snippets.Statistics.SmallLikes />
+    <Tabler.Docs.Components.Snippets.Statistics.SmallLikes />
     </RowCol>
     <RowCol Sm="12" Md="6" Lg="3">
-        <Tabler.Docs.Components.Snippets.Statistics.SmallMembers />
+    <Tabler.Docs.Components.Snippets.Statistics.SmallMembers />
     </RowCol> *@
 
     <RowCol Sm="12" Md="6" Lg="3">
         <Tabler.Docs.Components.Snippets.Statistics.StatisticsMedium />
     </RowCol>
-@*     <RowCol Sm="12" Md="6" Lg="3">
-        <Tabler.Docs.Components.Snippets.Statistics.StatisticsChart />
+    @*     <RowCol Sm="12" Md="6" Lg="3">
+    <Tabler.Docs.Components.Snippets.Statistics.StatisticsChart />
     </RowCol>
     <RowCol Sm="12" Md="6" Lg="3">
-        <Tabler.Docs.Components.Snippets.Statistics.StatisticsLineChart />
+    <Tabler.Docs.Components.Snippets.Statistics.StatisticsLineChart />
     </RowCol>
     <RowCol Sm="12" Md="6" Lg="3">
-        <Tabler.Docs.Components.Snippets.Statistics.StatisticsMedium />
+    <Tabler.Docs.Components.Snippets.Statistics.StatisticsMedium />
     </RowCol> *@
 
     <RowCol Sm="12" Lg="6">
         <Tabler.Docs.Components.Snippets.Tables.CustomerList />
     </RowCol>
-@* 
+    @*
     <RowCol Sm="12" Lg="6">
-        <Tabler.Docs.Components.Snippets.Tables.Orders />
+    <Tabler.Docs.Components.Snippets.Tables.Orders />
     </RowCol>
 
- *@
+    *@
 </Row>
 
 @code {
@@ -62,8 +64,15 @@
             var userId = await _localStorage.GetItemAsync<int?>("profile") ?? 0;
 
             userData = _authService.GetUserById(userId);
-            skills = await _datasetService.GetStudentSkillByUserIdAsync(userId);
-            await _localStorage.SetItemAsync("skills", skills);
+            skills = await _datasetService.GetStudentSkillsByUserIdAsync(userId);
+            var options = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                    WriteIndented = true
+                };
+
+            var json = JsonSerializer.Serialize(skills, options);
+            await _localStorage.SetItemAsync("skills_json", json);
             StateHasChanged();
         }
 

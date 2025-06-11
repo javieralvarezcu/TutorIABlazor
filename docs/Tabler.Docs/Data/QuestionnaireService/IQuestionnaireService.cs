@@ -13,5 +13,12 @@ namespace Tabler.Docs.Data.QuestionnaireService
         Task<List<QuestionBase>> RequestQuestionsToAi(string topic, string difficulty, int numQuestions);
         Task<List<QuestionBase>> GetQuestionByIdsAsync(int[] id);
         Task<StartRealTimeEvaluationResponse> StartRealTimeEvaluation(int userId, string[] skillNames);
+        Task<RealTimeEvaluationIterationResponse> IterateRealTimeEvaluationAsync(
+    int userId,
+    string skillName,
+    int correct,
+    string itemId,
+    string subjectId,
+    string roasterPath);
     }
 }

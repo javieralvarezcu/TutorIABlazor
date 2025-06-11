@@ -1,5 +1,7 @@
 ﻿@page "/select-skills"
 @using System.Globalization
+@using System.Text.Json
+@using System.Text.Json.Serialization
 @using Tabler.Docs.Model.Dataset
 @inject IDatasetService _datasetService
 @inject NavigationManager _navigation
@@ -22,7 +24,7 @@
                 {
                     <button class="w-100 text-start border-0 bg-white p-0 user-select-none" style="cursor: pointer;" @onclick="() => OnSkillSelected(skill)">
                         <div class="card-body border-bottom text-center d-flex justify-content-center align-items-center" style="min-height: 4rem;">
-                            <h5 class="mb-0">@CultureInfo.CurrentCulture.TextInfo.ToTitleCase(skill.Replace("_", " "))</h5>
+                            <h5 class="mb-0">@CultureInfo.CurrentCulture.TextInfo.ToTitleCase(skill.Name.Replace("_", " "))</h5>
                         </div>
                     </button>
                 }
@@ -32,21 +34,23 @@
 </div>
 
 @code {
-    private List<string> skills = new();
+    private List<StudentSkill> skills = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            skills = (await _localStorage.GetItemAsync<List<StudentSkill>>("skills"))
-                        .Select(s => s.Name)
-                        .Distinct()
-                        .ToList();
+            var json = await _localStorage.GetItemAsync<string>("skills_json");
+            skills = JsonSerializer.Deserialize<List<StudentSkill>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    ReferenceHandler = ReferenceHandler.IgnoreCycles
+                });
             StateHasChanged();
         }
     }
 
-    private async Task OnSkillSelected(string skill)
+    private async Task OnSkillSelected(StudentSkill skill)
     {
         await _localStorage.SetItemAsync("selectedSkill", skill);
         _navigation.NavigateTo("/questionnaire/step");

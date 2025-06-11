@@ -121,5 +121,45 @@ namespace Tabler.Docs.Data.QuestionnaireService
 
             return result!;
         }
+
+        public async Task<RealTimeEvaluationIterationResponse> IterateRealTimeEvaluationAsync(
+    int userId,
+    string skillName,
+    int correct,
+    string itemId,
+    string subjectId,
+    string roasterPath)
+        {
+            var payload = new
+            {
+                order_id = _dbContext.Users.Where(u => u.Id == userId).FirstOrDefault().LastQuestionOrderId,
+                user_id = userId.ToString(),
+                skill_name = skillName,
+                correct = correct,
+                item_id = itemId,
+                subject_id = subjectId,
+                roaster_path = roasterPath
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(payload),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _studentEvalHttpClient.PostAsync("/evaluation/real_time_evaluation", content);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<RealTimeEvaluationIterationResponse>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            _dbContext.Users.Where(u => u.Id == userId).FirstOrDefault().LastQuestionOrderId++;
+            _dbContext.SaveChanges();
+
+            return result!;
+        }
     }
 }

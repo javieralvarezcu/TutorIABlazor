@@ -1,6 +1,7 @@
 ﻿@page "/questionnaire/step"
 @using Tabler.Docs.Components.Questionnaire
 @using Tabler.Docs.Data.QuestionnaireService
+@using Tabler.Docs.Model.Dataset
 @using Tabler.Docs.Model.Evaluation
 @using Tabler.Docs.Model.Questionnaire
 @layout MinimalLayout
@@ -43,6 +44,8 @@
     private int currentIndex = 0;
     private StartRealTimeEvaluationResponse startRealTimeEvaluationResponse = null;
     private string statusInfo = "Inicializando cuestionario";
+    int UserId = 0;
+    StudentSkill Skill = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -50,22 +53,53 @@
         {
             statusInfo = "Obteniendo Id del usuario...";
             StateHasChanged();
-            var userId = await _localStorage.GetItemAsync<int?>("profile") ?? 0;
-            string skill = await _localStorage.GetItemAsync<string>("selectedSkill");
+            UserId = await _localStorage.GetItemAsync<int?>("profile") ?? 0;
+            Skill = await _localStorage.GetItemAsync<StudentSkill>("selectedSkill");
             statusInfo = "Cargando preguntas...";
             StateHasChanged();
-            var cachedQuestions = await _questionnaireService.RequestQuestionsToAi(skill, "easy", 2);
+            var cachedQuestions = await _questionnaireService.RequestQuestionsToAi(Skill.Name, "easy", 2);
             statusInfo = "Iniciando evaluación en tiempo real...";
             StateHasChanged();
-            startRealTimeEvaluationResponse = await _questionnaireService.StartRealTimeEvaluation(userId, new string[] { skill });
+            startRealTimeEvaluationResponse = await _questionnaireService.StartRealTimeEvaluation(UserId, new string[] { Skill.Name });
             questions = cachedQuestions;
             statusInfo = $"Evaluación iniciada.\n{startRealTimeEvaluationResponse.ToString()}";
             StateHasChanged();
         }
     }
 
-    private void NextQuestion()
+    private async void NextQuestion()
     {
+        // Recuperar la pregunta actual como UniqueChoiceQuestion
+        var currentQuestion = questions[currentIndex] as UniqueChoiceQuestion;
+
+        // Calcular valor de "correct" para el endpoint
+        int correctValue = -1;
+        if (currentQuestion != null)
+        {
+            if (currentQuestion.Options.Any(o => o.IsSelected))
+            {
+                correctValue = currentQuestion.IsCorrect ? 1 : 0;
+            }
+        }
+
+        var iterationResponse = await _questionnaireService.IterateRealTimeEvaluationAsync(
+            userId: UserId,
+            skillName: Skill.Name,
+            correct: correctValue,
+            itemId: questions[currentIndex].Id.ToString(),
+            subjectId: Skill.StudentSubject.Name,
+            roasterPath: startRealTimeEvaluationResponse.RosterPaths.FirstOrDefault().Value
+        );
+
         currentIndex++;
+        if (currentIndex >= questions.Count)
+        {
+            _navigation.NavigateTo("/dashboard");
+        }
+        else
+        {
+            StateHasChanged(); 
+        }
     }
+
 }
