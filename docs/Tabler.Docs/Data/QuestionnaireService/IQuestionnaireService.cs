@@ -10,11 +10,8 @@ namespace Tabler.Docs.Data.QuestionnaireService
 {
     public interface IQuestionnaireService
     {
-        Task<List<QuestionBase>> GetQuestionsAsync();
+        Task<List<QuestionBase>> RequestQuestionsToAi(string topic, string difficulty, int numQuestions);
         Task<List<QuestionBase>> GetQuestionByIdsAsync(int[] id);
-        Task AddQuestionAsync(QuestionBase question);
-        Task UpdateQuestionAsync(QuestionBase question);
-        Task DeleteQuestionAsync(int id);
         Task<StartRealTimeEvaluationResponse> StartRealTimeEvaluation(int userId, string[] skillNames);
     }
 }

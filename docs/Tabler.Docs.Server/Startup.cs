@@ -10,6 +10,7 @@ using Blazored.LocalStorage;
 using Tabler.Docs.Data.AuthService;
 using Tabler.Docs.Data.QuestionnaireService;
 using System;
+using Tabler.Docs.Data.DatasetService;
 
 
 namespace Tabler.Docs.Server
@@ -30,15 +31,22 @@ namespace Tabler.Docs.Server
             services.AddScoped<IDataService, LocalDataService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IQuestionnaireService, QuestionnaireService>();
+            services.AddScoped<IDatasetService, DatasetService>();
             services.AddDbContextFactory<ApplicationDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:ServernitaxxConnection"]));
             services.AddQuickTableEntityFrameworkAdapter();
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddBlazoredLocalStorage();
 
-            services.AddHttpClient("InternalApiClient", client =>
+            services.AddHttpClient("StudentEvalApiClient", client =>
             {
-                client.BaseAddress = new Uri(Configuration["ApiUris:Local"]); // ajusta según tu caso
+                client.BaseAddress = new Uri(Configuration["ApiUris:StudentEvalLocal"]); // ajusta según tu caso
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+
+            services.AddHttpClient("ContentGeneratorApiClient", client =>
+            {
+                client.BaseAddress = new Uri(Configuration["ApiUris:ContentGeneratorLocal"]); // ajusta según tu caso
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
 

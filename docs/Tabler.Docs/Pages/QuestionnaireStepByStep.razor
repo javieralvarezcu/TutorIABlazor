@@ -15,15 +15,15 @@
 
         @if (questions is null || currentIndex >= questions.Count)
         {
-            <p class="text-center">¡Cuestionario completado!</p>
+            <p class="text-center">No hay preguntas disponibles.</p>
         }
         else
         {
             <div>
                 @switch (questions[currentIndex])
                 {
-                    case MultipleChoiceQuestion mcq:
-                        <MultipleChoiceQuestionCard Question="@mcq" />
+                    case UniqueChoiceQuestion mcq:
+                        <UniqueChoiceQuestionCard Question="@mcq" />
                         break;
 
                     default:
@@ -48,17 +48,18 @@
     {
         if (firstRender)
         {
-            statusInfo = "Cargando preguntas...";
-            StateHasChanged();
-            var cachedQuestions = await _questionnaireService.GetQuestionByIdsAsync(new int[] { 2, 3, 4 });
             statusInfo = "Obteniendo Id del usuario...";
             StateHasChanged();
             var userId = await _localStorage.GetItemAsync<int?>("profile") ?? 0;
+            string skill = await _localStorage.GetItemAsync<string>("selectedSkill");
+            statusInfo = "Cargando preguntas...";
+            StateHasChanged();
+            var cachedQuestions = await _questionnaireService.RequestQuestionsToAi(skill, "easy", 2);
             statusInfo = "Iniciando evaluación en tiempo real...";
             StateHasChanged();
-            startRealTimeEvaluationResponse = await _questionnaireService.StartRealTimeEvaluation(userId, new string[] { "algebra", "lens" });
-            statusInfo = $"Evaluación iniciada.\n{startRealTimeEvaluationResponse.ToString()}";
+            startRealTimeEvaluationResponse = await _questionnaireService.StartRealTimeEvaluation(userId, new string[] { skill });
             questions = cachedQuestions;
+            statusInfo = $"Evaluación iniciada.\n{startRealTimeEvaluationResponse.ToString()}";
             StateHasChanged();
         }
     }

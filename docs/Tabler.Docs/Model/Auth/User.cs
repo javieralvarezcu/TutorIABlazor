@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tabler.Docs.Model.Dataset;
 
 namespace Tabler.Docs.Model.Auth
 {
@@ -10,5 +11,6 @@ namespace Tabler.Docs.Model.Auth
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public List<StudentSubject> Subjects { get; set; }
     }
 }
