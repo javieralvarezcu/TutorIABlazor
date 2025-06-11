@@ -21,6 +21,9 @@
         else
         {
             <div>
+                <Progress Size="ProgressSize.Small" Percentage="@(PercentageBar)" />
+            </div>
+            <div>
                 @switch (questions[currentIndex])
                 {
                     case UniqueChoiceQuestion mcq:
@@ -46,6 +49,7 @@
     private string statusInfo = "Inicializando cuestionario";
     int UserId = 0;
     StudentSkill Skill = new();
+    private int PercentageBar = 0;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -82,7 +86,7 @@
             }
         }
 
-        var iterationResponse = await _questionnaireService.IterateRealTimeEvaluationAsync(
+        RealTimeEvaluationIterationResponse iterationResponse = await _questionnaireService.IterateRealTimeEvaluationAsync(
             userId: UserId,
             skillName: Skill.Name,
             correct: correctValue,
@@ -90,6 +94,8 @@
             subjectId: Skill.StudentSubject.Name,
             roasterPath: startRealTimeEvaluationResponse.RosterPaths.FirstOrDefault().Value
         );
+
+        PercentageBar = (int)Math.Round(iterationResponse.state_prob * 100);
 
         currentIndex++;
         if (currentIndex >= questions.Count)
