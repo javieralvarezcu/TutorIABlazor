@@ -176,7 +176,10 @@ namespace Tabler.Docs.Data.QuestionnaireService
             );
 
             var response = await _studentEvalHttpClient.PostAsync("/evaluation/get_student_state_roaster", content);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
 
             var json = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<List<GetStudentStateRoasterResponse>>(json, new JsonSerializerOptions

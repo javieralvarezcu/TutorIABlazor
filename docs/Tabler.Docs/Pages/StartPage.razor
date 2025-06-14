@@ -87,7 +87,7 @@
                 StatusType statusType = StatusType.Inactivo;
                 int progressBarPercentage = (int)Math.Round(skill.Learn * 100);
                 int progressIconPercentage = 0;
-                var stateRoaster = getStudentStateRoaster.FirstOrDefault(x => x.skill_name == skill.Name);
+                var stateRoaster = getStudentStateRoaster?.FirstOrDefault(x => x.skill_name == skill.Name);
                 if (stateRoaster != null)
                 {
                     switch (stateRoaster.state)
