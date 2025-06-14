@@ -10,39 +10,39 @@
 
 <div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
     <div class="w-75" style="max-width: 50rem;">
-
-        <h1 class="text-center mb-4">Questionnaire Step By Step</h1>
         <h4 class="text-center mb-4">@statusInfo</h4>
 
         @if (questions is null || currentIndex >= questions.Count)
         {
-            <div class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
-                <span class="loader2"></span>
-            </div>
+                <div class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
+                    <span class="loader2"></span>
+                </div>
         }
         else
         {
-            <div class="p">
-                <Progress Size="ProgressSize.Small" Percentage="@(ProgressBar)" />
-            </div>
-            <div>
+                <div class="p">
+                    <Progress Size="ProgressSize.Small" Percentage="@(ProgressBar)" />
+                </div>
+                <div>
                 @switch (questions[currentIndex])
                 {
                     case UniqueChoiceQuestion mcq:
-                        <UniqueChoiceQuestionCard Question="@mcq" />
+                                    <UniqueChoiceQuestionCard Question="@mcq" />
                         break;
 
                     default:
-                        <p>Tipo de pregunta no soportado.</p>
+                                    <p>Tipo de pregunta no soportado.</p>
                         break;
                 }
 
-                <button class="btn btn-primary mt-3 float-end" @onclick="NextQuestion">Siguiente</button>
-            </div>
+                    <button class="btn btn-primary mt-3 float-end" @onclick="NextQuestion">Siguiente</button>
+                    <!-- Botón de salir -->
+                    <button class="btn btn-secondary mt-3" @onclick="GoToDashboard">Salir al Dashboard</button>
+                </div>
         }
-
     </div>
 </div>
+
 <style>
     .loader2 {
         width: 48px;
@@ -56,17 +56,10 @@
     }
 
     @@keyframes rotation {
-        0%
-
-    {
-        transform: rotate(0deg);
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
-
-    100% {
-        transform: rotate(360deg);
-    }
-
-    }</style>
+</style>
 
 @code {
     private List<QuestionBase>? questions = new();
@@ -129,8 +122,13 @@
         else
         {
             ProgressBar = (int)(((double)(currentIndex) / questions.Count) * 100);
-            StateHasChanged(); 
+            StateHasChanged();
         }
     }
 
+    // Método para salir al Dashboard
+    private void GoToDashboard()
+    {
+        _navigation.NavigateTo("/dashboard");
+    }
 }
