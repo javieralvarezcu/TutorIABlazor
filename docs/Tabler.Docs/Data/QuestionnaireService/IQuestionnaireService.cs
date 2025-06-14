@@ -20,5 +20,6 @@ namespace Tabler.Docs.Data.QuestionnaireService
     string itemId,
     string subjectId,
     string roasterPath);
+        Task<List<GetStudentStateRoasterResponse>> GetStudentStateRoaster(int userId);
     }
 }

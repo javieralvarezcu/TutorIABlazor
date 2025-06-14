@@ -161,5 +161,31 @@ namespace Tabler.Docs.Data.QuestionnaireService
 
             return result!;
         }
+
+        public async Task<List<GetStudentStateRoasterResponse>> GetStudentStateRoaster(int userId)
+        {
+            var payload = new
+            {
+                user_id = userId.ToString()
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(payload),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _studentEvalHttpClient.PostAsync("/evaluation/get_student_state_roaster", content);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<List<GetStudentStateRoasterResponse>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+
+            return result!;
+        }
     }
 }

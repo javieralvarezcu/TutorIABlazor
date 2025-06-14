@@ -176,8 +176,16 @@ namespace Tabler.Docs.Data.DatasetService
         {
             return _dbContext.StudentSkills
                 .Include(ss => ss.StudentSubject)
+                .Include(ss => ss.StudentSubject.Skills)
                 .Where(ss => ss.StudentSubject.UserId == userId)
                 .ToListAsync();
+        }
+
+        public async Task<StudentSubject> GetStudentSubjectByUserIdAsync(int userId)
+        {
+            return _dbContext.StudentSubjects
+                .Include(ss => ss.Skills)
+                .Where(ss => ss.UserId == userId).FirstOrDefault();
         }
 
         public async Task<StudentStateRoasterResponseBody> GetStudentStateRoasterById(int userId)

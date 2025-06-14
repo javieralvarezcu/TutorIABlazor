@@ -1,9 +1,12 @@
+@using Tabler.Docs.Model.Evaluation
+@using Tabler.Docs.Data.QuestionnaireService
+@inject IQuestionnaireService _questionnaireService
 <Card>
     <CardBody>
         <div class="d-flex align-items-center">
             <div class="subheader">Sales</div>
             <div class="ms-auto lh-1">
-@*                 <Dropdown>
+                @*                 <Dropdown>
                     <ChildContent>
                         <a class="dropdown-toggle text-secondary" aria-haspopup="true" aria-expanded="false">
                             Last 7 days
@@ -16,13 +19,13 @@
                             <DropdownItem>Last 3 months</DropdownItem>
                         </DropdownMenu>
                     </DropdownTemplate>
-                    
+
                 </Dropdown> *@
             </div>
         </div>
         <div class="h1 mb-3">75%</div>
         <div class="d-flex mb-2">
-            <div>Conversion rate</div>
+            <div>Aprendizaje total</div>
             <div class="ms-auto">
                 <span class="text-green d-inline-flex align-items-center lh-1">
                     @(RelativePercentage.ToString())% <Icon class="ms-1" Size="16" IconType="@TrendingIcon" />
@@ -38,12 +41,21 @@
     [Parameter] public int RelativePercentage { get; set; } = 20;
     [Parameter] public int PercentageBar { get; set; } = 10;
     IIconType TrendingIcon = TablerIcons.Trending_up;
+    int UserId = 0;
 
     protected override void OnInitialized()
     {
         if (RelativePercentage < 0)
         {
             TrendingIcon = TablerIcons.Trending_down;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            UserId = await _localStorage.GetItemAsync<int?>("profile") ?? 0;
         }
     }
 }

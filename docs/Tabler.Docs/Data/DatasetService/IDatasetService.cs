@@ -12,5 +12,6 @@ namespace Tabler.Docs.Data.DatasetService
         Task<CheckStudentDatasetResponseBody> CheckStudentDataset();
         Task<StudentStateRoasterResponseBody> GetStudentStateRoasterById(int userId);
         Task<List<StudentSkill>> GetStudentSkillsByUserIdAsync(int userId);
+        Task<StudentSubject> GetStudentSubjectByUserIdAsync(int userId);
     }
 }
